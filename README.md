@@ -1,9 +1,9 @@
 # TD&TP-Docker
-## Question 1-1:Pourquoi passer les variables avec -e au run plutôt que dans le Dockerfile ?
+## Question 1-1: For which reason is it better to run the container with a flag -e to give the environment variables rather than put them directly in the Dockerfile?
 ça nous évite d’écrire des mots de passe visible dans l’image  et permettre de changer la configuration à l’exécution sans reconstruire l’image.
-## Question 1-2:Pourquoi faut-il un volume attaché au conteneur Postgres ?
+## Question 1-2Why do we need a volume to be attached to our postgres container?
 Parce que sans volume, les données sont stockées dans le système de fichiers éphémère du conteneur et sont perdues si le conteneur est détruit. Un volume garantit la persistance sur le disque de l’hôte.
-## Question1-3:
+## Question1-3: Document your database container essentials: commands and Dockerfile
 ### Command
 **Construire une image Docker à partir du Dockerfile présent dans le dossier courant.**
 docker build -t postgres-db-img .
@@ -45,3 +45,8 @@ docker run -d --name postgres-db-ctr --network app-network -p 5432:5432 `
 ### Dockerfile
 FROM postgres:17.2-alpine
 COPY initdb/ /docker-entrypoint-initdb.d/
+
+## Question 1-4: Why do we need a multistage build? And explain each step of this dockerfile.
+
+On utilise un multistage build pour rendre l’image finale plus légère, plus rapide et plus sécurisée.
+Comme ça on sépare la phase de build où l’on compile le projet avec JDK par exemple de la phase d’exéction où seule la JRE est nécessaire.
