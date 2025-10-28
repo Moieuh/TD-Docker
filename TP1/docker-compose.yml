@@ -1,0 +1,52 @@
+
+services:
+  # ---- Database ----
+  database:
+    build: ./db
+    container_name: postgres-db-ctr
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # ---- Backend ----
+  backend:
+    build: ./API/demo
+    container_name: simple-api-ctr
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    depends_on:
+      - database
+    networks:
+      - app-network
+      - front-network
+    restart: on-failure:3
+
+  # ---- HTTP Server ----
+  httpd:
+    build: ./http-server
+    container_name: http-server-ctr
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - front-network
+    restart: no
+
+# ---- Networks ----
+networks:
+  app-network:
+    driver: bridge
+  front-network:
+    driver: bridge
+# ---- Volumes ----
+volumes:
+  db_data:
